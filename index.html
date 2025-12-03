@@ -21,21 +21,15 @@
         <h1>Charity Hockey Game Interest Form</h1>
         <p class="subtitle">
           Drop your info below to pre-register for the upcoming charity hockey
-          game between the MBFD & CCU Hockey.
+          game between the MBFD & CCU Hockey Clubs.
           <br />
-          <br />Saturday, January 17, 2026; 2:00 PM 
-          <br />at the Florence Center
+          <br />Saturday January 17, 2025; 2:00 PM at the Florence Center.
           <br />3300 W Radio Dr, Florence, SC 29501
         </p>
       </header>
 
       <main>
-        <form
-          id="interestForm"
-          class="form-card"
-          action="https://formspree.io/f/meonoypv"
-          method="POST"
-        >
+        <form id="interestForm" class="form-card">
           <div class="form-row">
             <div class="field">
               <label for="firstName"
@@ -96,35 +90,48 @@
       </footer>
     </div>
 
-    <script>
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+      const supabaseUrl = "https://abtgrkpclvfcopzitqsq.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFidGdya3BjbHZmY29weml0cXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3MjY5NTksImV4cCI6MjA4MDMwMjk1OX0.HwToWYWvGWG_I2aVmMa992mqhR-T_YaDJCQOCoMzZa0";
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
       const form = document.getElementById("interestForm");
       const thankYou = document.getElementById("thankYou");
 
-      form.addEventListener("submit", async function (e) {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const formData = new FormData(form);
 
-        try {
-          const response = await fetch(form.action, {
-            method: "POST",
-            body: formData,
-            headers: { Accept: "application/json" },
-          });
+        const payload = {
+          first_name: formData.get("firstName"),
+          last_name: formData.get("lastName"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          affiliation: formData.get("affiliation"),
+        };
 
-          if (response.ok) {
-            form.reset();
-            thankYou.hidden = false;
-          } else {
+        try {
+          const { error } = await supabase
+            .from("ccu_charity_interest")
+            .insert(payload);
+
+          if (error) {
+            console.error(error);
             alert("Issue submitting the form. Please try again.");
+            return;
           }
+
+          form.reset();
+          thankYou.hidden = false;
         } catch (err) {
-          alert("Network error. Please try again.");
           console.error(err);
+          alert("Network error. Please try again.");
         }
       });
     </script>
   </body>
 </html>
-
-
